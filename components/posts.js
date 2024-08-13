@@ -1,16 +1,27 @@
 "use client";
 
-
 import { formatDate } from "@/lib/format";
 import LikeButton from "./like-icon";
 import { togglePostLikeStatus } from "@/actions/posts";
 import { useOptimistic } from "react";
+import Image from "next/image";
+
+
+function imageLoader(config){
+  console.log(config);
+  const urlStart = config.src.split("upload/")[0];
+  const urlEnd = config.src.split("upload/")[1];
+  const transformations = `w_${'200'},q_${config.quality}`;
+  return `${urlStart}upload/${transformations}/${urlEnd}`;
+  
+}
+
 
 function Post({ post, action }) {
   return (
     <article className="post">
       <div className="post-image">
-        <img src={post.image} alt={post.title} />
+        <Image src={post.image}  alt={post.title} loader={imageLoader} quality={100} sizes="10vw" width={200} height={120}/>
       </div>
       <div className="post-content">
         <header>
@@ -50,7 +61,7 @@ export default function Posts({ posts }) {
         return prevPosts;
       }
 
-      const updatedPosts = {...prevPosts[updatedPostIndex]};
+      const updatedPosts = { ...prevPosts[updatedPostIndex] };
       updatedPosts.likes = updatedPosts.likes + (updatedPosts.isLiked ? -1 : 1);
       updatedPosts.isLiked = !updatedPosts.isLiked;
       const newPosts = [...prevPosts];
